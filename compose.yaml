@@ -1,0 +1,12 @@
+services:
+  app:
+    image: analystics-api:v1
+    build:
+      context: .
+      dockerfile: Dockerfile.web
+    environment:
+      - PORT=8002
+    env_file:
+      - .env
+    ports:
+      - "8002:8002"
