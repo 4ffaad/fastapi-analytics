@@ -25,3 +25,9 @@ def create_events(data:dict = {}) -> EventSchema:
 @router.get("/{event_id}")
 def get_event(event_id: int) -> EventSchema:
     return {"id":event_id}
+
+
+#Update this data
+@router.put("/{event_id}")
+def update_event(event_id: int, payload:dict={}) -> EventSchema:
+    return {"id":event_id}
