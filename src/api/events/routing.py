@@ -4,6 +4,7 @@ from .schemas import EventSchema, EventListSchema
 
 router = APIRouter()
 
+# List View
 @router.get("/")
 def read_events() -> EventListSchema:
     return {
@@ -12,6 +13,13 @@ def read_events() -> EventListSchema:
             ],
             "count": 3
         }
+
+# Send data
+# Create View 
+@router.post("/")
+def create_events(data:dict = {}) -> EventSchema:
+    print(data)
+    return { "id" : 123}
 
 
 @router.get("/{event_id}")
