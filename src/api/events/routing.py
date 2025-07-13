@@ -24,7 +24,9 @@ def read_events() -> EventListSchema:
 @router.post("/")
 def create_events(payload:EventCreateSchema) -> EventSchema:
     print(payload.page)
-    return { "id" : 123}
+    # Here you would typically save the data to a database
+    data = payload.model_dump()
+    return { "id" : 123, **data } 
 
 
 @router.get("/{event_id}")
@@ -35,5 +37,5 @@ def get_event(event_id: int) -> EventSchema:
 #Update this data
 @router.put("/{event_id}")
 def update_event(event_id: int, payload:EventUpdateSchema) -> EventSchema:
-    print (payload.description)
-    return {"id":event_id}
+    data = payload.model_dump()
+    return {"id":event_id, **data}
