@@ -1,7 +1,7 @@
 import os
 from fastapi import APIRouter
 from .models import (
-    EventSchema,
+    EventModel,
     EventListSchema, 
     EventCreateSchema,
     EventUpdateSchema
@@ -24,7 +24,7 @@ def read_events() -> EventListSchema:
 # Send data
 # Create View 
 @router.post("/")
-def create_events(payload:EventCreateSchema) -> EventSchema:
+def create_events(payload:EventCreateSchema) -> EventModel:
     print(payload.page)
     # Here you would typically save the data to a database
     data = payload.model_dump()
@@ -32,12 +32,12 @@ def create_events(payload:EventCreateSchema) -> EventSchema:
 
 
 @router.get("/{event_id}")
-def get_event(event_id: int) -> EventSchema:
+def get_event(event_id: int) -> EventModel:
     return {"id":event_id}
 
 
 #Update this data
 @router.put("/{event_id}")
-def update_event(event_id: int, payload:EventUpdateSchema) -> EventSchema:
+def update_event(event_id: int, payload:EventUpdateSchema) -> EventModel:
     data = payload.model_dump()
     return {"id":event_id, **data}

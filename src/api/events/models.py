@@ -5,7 +5,7 @@ id
 path 
 description
 """
-class EventSchema(SQLModel):
+class EventModel (SQLModel, table=True):
     id: Optional[int] = Field(default=None, primary_key=True)   
     page: Optional[str] = ""
     description: Optional[str] = ""
@@ -20,5 +20,5 @@ class EventUpdateSchema(SQLModel):
 
 
 class EventListSchema(SQLModel):
-    results: List[EventSchema]
+    results: List[EventModel]
     count: int
