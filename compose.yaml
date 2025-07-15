@@ -6,6 +6,7 @@ services:
       dockerfile: Dockerfile.web
     environment:
       - PORT=8002
+      - DATABASE_URL=postgresql://time-user:time-pw@db_service:5432/time-db
     env_file:
       - .env
     ports:
@@ -21,3 +22,21 @@ services:
           path: requirements.txt
         - action: rebuild
           path: compose.yaml
+  db_service:
+    image: timescale/timescaledb:latest-pg17
+    environment:
+      POSTGRES_USER: time-user
+      POSTGRES_PASSWORD: time-pw
+      POSTGRES_DB: time-db
+    ports:
+      - "5432:5432"
+    expose:
+      - 5432
+    volumes:
+      - timescaledb_data:/var/lib/postgresql/data
+
+volumes:
+  timescaledb_data:
+
+
+
