@@ -4,9 +4,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile.web
-    environment:
-      - PORT=8002
-      - DATABASE_URL=postgresql://time-user:time-pw@db_service:5432/time-db
+    env_file::
+      - .env.comopose
     env_file:
       - .env
     ports:
