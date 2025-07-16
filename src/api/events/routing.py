@@ -1,5 +1,5 @@
 import os
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
 
 from api.db.session import get_session
@@ -39,13 +39,51 @@ def create_events(
     return obj
 
 
-@router.get("/{event_id}")
-def get_event(event_id: int) -> EventModel:
-    return {"id":event_id}
+@router.get("/{event_id}", response_model=EventModel)
+def get_event(
+    event_id: int, 
+    session: Session = Depends(get_session)
+    ):
+    query = select(EventModel).where(EventModel.id == event_id)
+    result = session.exec(query).first()
+    if not result:
+        raise HTTPException(
+            status_code=404,
+            detail=f"Event with id {event_id} not found."
+        )
+    return result
 
 
 #Update this data
-@router.put("/{event_id}")
-def update_event(event_id: int, payload:EventUpdateSchema) -> EventModel:
-    data = payload.model_dump()
-    return {"id":event_id, **data}
+@router.put("/{event_id}", response_model=EventModel)
+def update_event(
+    event_id: int, 
+    payload: EventUpdateSchema,
+    session: Session = Depends(get_session)
+):
+    event = session.exec(select(EventModel).where(EventModel.id == event_id)).first()
+    if not event:
+        raise HTTPException(status_code=404, detail=f"Event with id {event_id} not found.")
+
+    for key, value in payload.model_dump(exclude_unset=True).items():
+        setattr(event, key, value)
+
+    session.add(event)
+    session.commit()
+    session.refresh(event)
+
+    return event
+
+# Delete this data  
+@router.delete("/{event_id}", status_code=204)
+def delete_event(
+    event_id: int,
+    session: Session = Depends(get_session)
+):
+    event = session.exec(select(EventModel).where(EventModel.id == event_id)).first()
+    if not event:
+        raise HTTPException(status_code=404, detail=f"Event with id {event_id} not found.")
+
+    session.delete(event)
+    session.commit()
+    return None  # 204 No Content
