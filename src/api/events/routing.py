@@ -1,5 +1,8 @@
 import os
-from fastapi import APIRouter
+from fastapi import APIRouter, Depends
+from sqlmodel import Session
+
+from api.db.session import get_session
 from .models import (
     EventModel,
     EventListSchema, 
@@ -23,12 +26,18 @@ def read_events() -> EventListSchema:
 
 # Send data
 # Create View 
-@router.post("/")
-def create_events(payload:EventCreateSchema) -> EventModel:
-    print(payload.page)
-    # Here you would typically save the data to a database
+@router.post("/", response_model=EventModel)
+def create_events(
+    payload:EventCreateSchema,
+    session: Session = Depends(get_session)):
+
+    # Validate and create the event object
     data = payload.model_dump()
-    return { "id" : 123, **data } 
+    obj = EventModel.model_validate(data)
+    session.add(obj)
+    session.commit()
+    session.refresh(obj)
+    return obj
 
 
 @router.get("/{event_id}")

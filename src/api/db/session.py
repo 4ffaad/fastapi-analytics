@@ -1,5 +1,5 @@
 import sqlmodel 
-from sqlmodel import SQLModel
+from sqlmodel import SQLModel, Session
 from .config import DATABASE_URL
 
 if DATABASE_URL == "":
@@ -10,3 +10,11 @@ engine = sqlmodel.create_engine("sqlite:///./test.db", echo=True)
 def init_db():
     print("Initializing database connection...")
     SQLModel.metadata.create_all(engine)
+
+def get_session():
+    """
+    Create a new SQLModel session.
+    """
+    with Session(engine) as session:
+        yield session
+        
