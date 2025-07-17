@@ -65,8 +65,10 @@ def update_event(
     if not event:
         raise HTTPException(status_code=404, detail=f"Event with id {event_id} not found.")
 
-    for key, value in payload.model_dump(exclude_unset=True).items():
+    data = payload.model_dump()
+    for key, value in data.items():
         setattr(event, key, value)
+        
 
     session.add(event)
     session.commit()
