@@ -7,7 +7,8 @@ from .models import (
     EventModel,
     EventListSchema, 
     EventCreateSchema,
-    EventUpdateSchema
+    EventUpdateSchema,
+    get_utc_now
 )
 from api.db.config import DATABASE_URL
 
@@ -69,7 +70,7 @@ def update_event(
     for key, value in data.items():
         setattr(event, key, value)
         
-
+    data.udpated_at = get_utc_now()
     session.add(event)
     session.commit()
     session.refresh(event)
