@@ -1,12 +1,17 @@
 import os
+from typing import List 
 from fastapi import APIRouter, Depends, HTTPException
 from sqlmodel import Session, select
+from timescaledb.hyperfunctions import time_bucket
+from sqlalchemy import func
+from datetime import datetime, timedelta, timezone
 
 from api.db.session import get_session
 from .models import (
     EventModel,
     EventListSchema, 
     EventCreateSchema,
+    EventBucketSchema,
     EventUpdateSchema,
     get_utc_now
 )
@@ -40,18 +45,32 @@ def create_events(
     return obj
 
 
-@router.get("/{event_id}", response_model=EventModel)
+@router.get("/{event_id}", response_model=EventBucketSchema)
 def get_event(
     event_id: int, 
     session: Session = Depends(get_session)
     ):
-    query = select(EventModel).where(EventModel.id == event_id)
-    result = session.exec(query).first()
-    if not result:
-        raise HTTPException(
-            status_code=404,
-            detail=f"Event with id {event_id} not found."
+    bucket = time_bucket("1 day", EventModel.time)  
+    pages = ['/about', '/contact', '/pages', '/pricing']
+    query = (
+        select(
+            bucket.label("bucket"),
+            EventModel.page.label("page"),
+            func.count().label("event_count"),
         )
+        .where(
+            EventModel.page.in_(pages)
+        )
+        .group_by(
+                bucket, 
+                EventModel.page
+                  )
+        .order_by(
+            bucket,
+            EventModel.page,
+            )
+    )
+    result = session.exec(query).fetchall()
     return result
 
 
