@@ -49,3 +49,5 @@ class EventBucketSchema(SQLModel):
     operating_system: Optional[str] = ""
     avg_duration: Optional[float] = 0.0
     count: int
+
+    
